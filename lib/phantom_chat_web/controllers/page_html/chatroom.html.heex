@@ -1,0 +1,40 @@
+<div class=" flex justify-center text-2xl">Chat Room</div>
+
+<%!--  todo show a flash message that user has joined the room--%>
+<%!-- <.flash_group flash={@flash} /> --%>
+
+<div class="flex justify-center" id="chat_room_name_unique_value">
+  {@chat_room_name}
+</div>
+
+<div class="flex justify-center" id="chat_room_name_unique_value">
+  User Name: {@user_name}
+</div>
+
+<div class="hidden" id="user_id_unique_value">
+  {@user_id}
+</div>
+
+<%!-- <p>Current Time:</p>
+  <%= live_render(@conn, PhantomChatWeb.LiveviewPage.TimerLive, id: "live-timer") %> --%>
+
+<div class="flex justify-center p-10">
+  <div class="p-10 m-10">
+    <%!-- <label> Enter the message </label> --%>
+    <%!-- <input
+      class="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
+      id="chat-input"
+      type="text"
+    /> --%>
+    <div class="p-5" id="messages" role="log" aria-live="polite">
+      <%!-- <span>Time left</span> --%>
+      <%!-- <span class="p-5" id="timeleft"></span> --%>
+    </div>
+    <label> Enter the message </label>
+    <input
+      class="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4"
+      id="chat-input"
+      type="text"
+    />
+  </div>
+</div>
