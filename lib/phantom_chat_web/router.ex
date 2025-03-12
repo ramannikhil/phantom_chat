@@ -6,33 +6,30 @@ defmodule PhantomChatWeb.Router do
     plug :fetch_session
     plug :fetch_live_flash
     plug :put_root_layout, html: {PhantomChatWeb.Layouts, :root}
-    plug :protect_from_forgery
+    # plug :protect_from_forgery
     plug :put_secure_browser_headers
-  end
-
-  pipeline :custom_plug do
-    # todo for testing purpose only
-    plug TryPlug.CustomPlug
+    plug Helper.Plug.UserAuth
   end
 
   pipeline :api do
     plug :accepts, ["json"]
   end
 
-  #  todo cleanup router
   scope "/", PhantomChatWeb do
-    pipe_through [:browser, :custom_plug]
+    pipe_through [:browser]
 
-    get "/", PageController, :home
-    # get "/chatroom/:id", PageController, :chatroom
+    get "/home", PageController, :home
+    get "/new_room", PageController, :new_room
+    post "/new_room", PageController, :new_room
+
+    get "/join_room", PageController, :join_room
+    post "/join_room", PageController, :join_room
+
     get "/chatroom/:room_name", PageController, :chatroom
   end
 
   scope "/", PhantomChatWeb do
-    pipe_through [:browser, :custom_plug]
-
-    # live "/livechat", LiveviewPage.Homechat
-    live "/timer", LiveviewPage.TimerLive
+    pipe_through [:browser]
   end
 
   # Other scopes may use custom stacks.

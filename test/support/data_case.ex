@@ -27,8 +27,17 @@ defmodule PhantomChat.DataCase do
     end
   end
 
+  # setup tags do
+  #   PhantomChat.DataCase.setup_sandbox(tags)
+  #   :ok
+  # end
   setup tags do
-    PhantomChat.DataCase.setup_sandbox(tags)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(PhantomChat.Repo)
+
+    unless tags[:async] do
+      Ecto.Adapters.SQL.Sandbox.mode(PhantomChat.Repo, {:shared, self()})
+    end
+
     :ok
   end
 

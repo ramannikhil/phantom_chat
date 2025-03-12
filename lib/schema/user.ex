@@ -13,6 +13,6 @@ defmodule PhantomChat.Schema.User do
 
   def changeset(user, params \\ %{}) do
     user
-    |> cast(params, [:name, :updated_at, :inserted_at])
+    |> cast(params, [:id, :name, :updated_at, :inserted_at])
   end
 end

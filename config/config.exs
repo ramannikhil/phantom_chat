@@ -53,6 +53,17 @@ config :tailwind,
     cd: Path.expand("../assets", __DIR__)
   ]
 
+config :phantom_chat, Oban,
+  repo: PhantomChat.Repo,
+  queues: [default: 10],
+  plugins: [
+    {Oban.Plugins.Cron,
+     crontab: [
+       {"* * * * *", PhantomChat.Workers.DeleteInactiveUsers},
+       {"0 * * * *", PhantomChat.Workers.DeleteInactiveChatRooms}
+     ]}
+  ]
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

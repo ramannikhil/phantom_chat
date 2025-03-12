@@ -9,12 +9,20 @@ defmodule PhantomChat.Schema.ChatRoom do
     field(:passcode, :string)
     field(:inserted_at, :naive_datetime)
     field(:updated_at, :naive_datetime)
-    # has_many(:messages, Messa)
+    field(:msg_duration_in_minutes, :integer, default: 5)
   end
 
   def changeset(chatroom, params \\ %{}) do
     chatroom
-    |> cast(params, [:room_name, :type, :passcode, :updated_at, :inserted_at])
+    |> cast(params, [
+      :id,
+      :room_name,
+      :type,
+      :passcode,
+      :msg_duration_in_minutes,
+      :updated_at,
+      :inserted_at
+    ])
     |> foreign_key_constraint(:user)
   end
 end

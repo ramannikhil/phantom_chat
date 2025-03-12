@@ -18,7 +18,8 @@ defmodule PhantomChat.Application do
       # {PhantomChat.Worker, arg},
       # Start to serve requests, typically the last entry
       PhantomChatWeb.Endpoint,
-      {Helper.HandleRefreshNewLogin, name: Helper.HandleRefreshNewLogin}
+      {Helper.HandleRefreshNewLogin, name: Helper.HandleRefreshNewLogin},
+      {Oban, Application.fetch_env!(:phantom_chat, Oban)}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

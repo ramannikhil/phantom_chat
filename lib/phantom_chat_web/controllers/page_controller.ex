@@ -4,42 +4,50 @@ defmodule PhantomChatWeb.PageController do
   alias PhantomChat.Repo
   import Plug.Conn
   import Ecto.Query
+  alias Helper.Service.ChatRoom, as: ChatRoomService
+
+  @default_msg_duration 5
 
   def home(conn, _params) do
-    # The home page is often custom made,
-    # so skip the default app layout.
-    #   IO.puts """
-    # Verb: #{inspect(conn.method)}
-    # Host: #{inspect(conn.host)}
-    # Headers: #{inspect(conn.req_headers)}
-    # conn: #{inspect(conn)}
-    # """
-    # put_flash(conn, :info, "todo ")
-    # |> render(:home, layout: false)
-
     render(conn, :home, layout: false)
   end
 
-  # chat_room_id from the route
-  # def chatroom(conn, %{"id" => chat_room_id} = _params) do
+  def new_room(conn, %{"room_name" => room_name, "message_duration" => message_duration}) do
+    message_duration =
+      case Integer.parse(message_duration) do
+        :error -> @default_msg_duration
+        {duration, _} -> duration
+      end
 
-  #   chat_room_name =
-  #     from(x in ChatRoom, where: x.id == ^chat_room_id, select: x.room_name) |> Repo.one()
+    {:ok, %ChatRoom{room_name: room_name}} =
+      ChatRoomService.create_chat_room(room_name, message_duration)
 
-  #   %{"user_id" => user_id} = get_session(conn)
+    conn
+    |> put_flash(:info, "Room created successfully. #{room_name}")
+    |> redirect(to: "/chatroom/#{room_name}")
+  end
 
-  #   render(conn, :chatroom, layout: false, chat_room_name: chat_room_name, user_id: user_id)
-  # end
+  def new_room(conn, _params) do
+    render(conn, :new_room, layout: false)
+  end
+
+  def join_room(conn, %{"room_name" => room_name}) do
+    conn
+    |> put_flash(:info, "Room joined successfully. #{room_name}")
+    |> redirect(to: "/chatroom/#{room_name}")
+  end
+
+  def join_room(conn, _params) do
+    render(conn, :join_room, layout: false)
+  end
 
   def chatroom(conn, %{"room_name" => chat_room_name} = _params) do
     user_id_from_session = get_session(conn, :user_id)
     user_name_from_session = get_session(conn, :user_name)
-    IO.inspect(user_id_from_session, label: "check the user_id_from_session ")
 
-    # GenServer.cast(Helper.HandleRefreshNewLogin, {:set_user_refresh, user_id_from_session})
     GenServer.cast(
       Helper.HandleRefreshNewLogin,
-      {:set_or_update_user_refresh, user_id_from_session}
+      {:set_user_refresh, user_id_from_session, chat_room_name}
     )
 
     from(x in ChatRoom, where: x.room_name == ^chat_room_name)
@@ -56,8 +64,10 @@ defmodule PhantomChatWeb.PageController do
         )
 
       false ->
-        render(conn, :chatroom_error,
-          error_message: "Chat Room doesn't Exist, Please check the room code"
+        conn
+        |> put_flash(:error, "Invalid Room name")
+        |> render(:chatroom_error,
+          error_message: "Chat Room doesnot Exist, Please check the room code"
         )
     end
   end
