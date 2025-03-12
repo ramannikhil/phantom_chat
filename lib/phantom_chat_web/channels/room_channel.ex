@@ -26,11 +26,19 @@ defmodule PhantomChatWeb.RoomChannel do
     if(user_state) do
       GenServer.cast(Helper.HandleRefreshNewLogin, {:update_user_refresh, user_id, chatroom_name})
 
+      # retreieve only the messages that were created before x min based on the chatroom configuration
+      %ChatRoom{msg_duration_in_minutes: message_duration} =
+        Repo.get_by(ChatRoom, room_name: chatroom_name)
+
+      chatroom_duration_ago =
+        NaiveDateTime.utc_now() |> NaiveDateTime.add(-message_duration * 60, :second)
+
       chat_room_messages =
         from(m in Message,
           join: u in assoc(m, :user),
           join: c in assoc(m, :chatroom),
           where: c.room_name == ^chatroom_name,
+          where: m.inserted_at >= ^chatroom_duration_ago,
           select: %{
             message: m.content,
             created_at: m.inserted_at,
